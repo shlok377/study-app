@@ -1,0 +1,21 @@
+# GUI Framework
+PyQt6
+pyqtdarktheme
+
+# PDF Processing
+PyMuPDF
+
+# AI/LLM
+ollama
+
+# Calendar File Generation
+ics
+
+# Date & Time Parsing
+dateparser
+
+# Database (for to-do lists, progress tracking)
+SQLAlchemy
+
+# System Interaction (for app blocking)
+psutil

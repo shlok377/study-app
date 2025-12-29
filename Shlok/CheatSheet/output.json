@@ -1,0 +1,48 @@
+{
+    "definitions": [
+        {
+            "term": "DataFrame",
+            "definition": "A two-dimensional labeled data structure with columns of potentially different types, similar to a spreadsheet or SQL table"
+        },
+        {
+            "term": "Matplotlib",
+            "definition": "A popular Python library for creating visualizations."
+        },
+        {
+            "term": "Pandas",
+            "definition": "A Python library for data manipulation and analysis"
+        },
+        {
+            "term": "Series",
+            "definition": "A one-dimensional labeled array capable of holding any data type"
+        }
+    ],
+    "comparisons": [],
+    "timelines": [],
+    "concepts": [
+        {
+            "name": "Matplotlib",
+            "explanation": "a popular Python library for creating static, interactive, and animated visualizations"
+        },
+        {
+            "name": "NumPy",
+            "explanation": "A Python library for numerical computing, which makes pandas fast and efficient for working with large datasets"
+        },
+        {
+            "name": "Pandas",
+            "explanation": "built on top of NumPy, providing a wide range of functionalities for data manipulation"
+        },
+        {
+            "name": "Pandas Library",
+            "explanation": "Essential for tasks ranging from data cleaning to complex data analysis and visualization"
+        },
+        {
+            "name": "publication-quality output",
+            "explanation": "Output quality provided by Matplotlib"
+        },
+        {
+            "name": "static, interactive, and animated visualizations",
+            "explanation": "Types of visualizations offered by Matplotlib"
+        }
+    ]
+}

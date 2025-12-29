@@ -1,0 +1,18 @@
+TAB 1: HOME (3 rectangular divisions)
+    - logo
+    - upload pdf(s)
+    - random quotes
+
+TAB 2: CheatSheet Generator (2 rectangular divisions)
+    - textbox for generated notes
+    - anything that you feel should be added
+
+TAB 3: Quiz Generator (2 rectangular divisions)
+    - textbox for generated quiz
+    - anything that you feel should be added
+
+TAB 4: POMODORO Timer
+    - (idk what to write here)
+
+TAB 5: Syllabus to Calendar Generator   
+    - (we'll discuss once all this is done)
