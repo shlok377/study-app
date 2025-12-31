@@ -1,8 +1,8 @@
 
-![Logo](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/th5xamgrr6se0x5ro4g6.png)
+![LuminaraLogo](https://github.com/shlok377/study-app/blob/main/Logos/LuminaraTransparentRect.png?raw=true)
 
 
-# **Student Academia**
+
 
 An AI-powered study companion application that plans your syllabus, summarizes your notes, tests your knowledge, and protects your focus.
 ## > *Key Features:*
@@ -68,6 +68,8 @@ Start the server
 
 
 ## > *Team & Roles:*
+
+![TeamLogo](https://github.com/shlok377/study-app/blob/main/Logos/TeamTransparentRect.png?raw=true)
 
 - [@shlok.dalsania](https://www.github.com/shlok377) ***Lead**, AI logic, CheatSheet and Quiz Generator*
 - [@vishva.pambhar](https://github.com/vishvapambhar19-commits) - *Frontend UI/UX, Other Apps Blocking*
