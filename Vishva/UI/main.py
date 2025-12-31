@@ -92,22 +92,24 @@ class LogoLabel(QLabel):
 
 
 class GlowButton(QPushButton):
-    """Accent Button (10%) with High-Intensity 5-Second Glow"""
+    """Accent Button with Snappy Hover, Dimmed Text, and 50% Glow Opacity"""
     def __init__(self, text, accent_color, parent=None):
         super().__init__(text, parent)
         self.accent = accent_color
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self._glow_opacity = 0
-
+        
+        # Fast animation (200ms) to keep the UI responsive
         self.anim = QVariantAnimation(self)
-        self.anim.setDuration(5000)
+        self.anim.setDuration(200) 
         self.anim.setStartValue(0.0)
         self.anim.setEndValue(1.0)
         self.anim.valueChanged.connect(self.update_glow)
-
+        
         self.setStyleSheet(self._base_stylesheet(font_px=13))
 
     def _base_stylesheet(self, font_px=13):
+        """Helper to create the button style with dynamic font size"""
         return f"""
             QPushButton {{
                 background-color: {self.accent};
@@ -118,9 +120,14 @@ class GlowButton(QPushButton):
                 border: 1px solid rgba(255, 255, 255, 30);
                 padding: 10px 14px;
             }}
+            QPushButton:hover {{
+                /* Dim the text slightly (80% opacity) so it stays visible */
+                color: rgba(255, 255, 255, 200); 
+            }}
         """
 
     def setFontPx(self, font_px: int):
+        """Changes the font size dynamically while keeping other styles"""
         self.setStyleSheet(self._base_stylesheet(font_px=font_px))
 
     def update_glow(self, value):
@@ -138,17 +145,22 @@ class GlowButton(QPushButton):
         super().leaveEvent(event)
 
     def paintEvent(self, event):
-        super().paintEvent(event)
+        # 1. Draw the GLOW FIRST as a background layer
         if self._glow_opacity > 0:
             painter = QPainter(self)
             painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-            glow_rect = self.rect().toRectF()
-            glow_color = QColor(self.accent)
-            glow_color.setAlphaF(self._glow_opacity * 0.95)
+            
+            glow_color = QColor(self.accent).lighter(110)
+            # Apply exactly 50% opacity at peak hover
+            glow_color.setAlphaF(self._glow_opacity * 0.5) 
+            
             painter.setPen(Qt.PenStyle.NoPen)
             painter.setBrush(glow_color)
-            painter.drawRoundedRect(glow_rect, 12, 12)
+            painter.drawRoundedRect(self.rect(), 12, 12)
+            painter.end()
 
+        # 2. Draw the BUTTON TEXT SECOND so it stays on top and visible
+        super().paintEvent(event)
 
 class ClickableTimer(QLabel):
     clicked = pyqtSignal()
@@ -765,7 +777,7 @@ class MainWindow(QMainWindow):
         self.notes_editor = QTextEdit()
         self.notes_editor.setPlaceholderText("Write or paste notes here...")
         self.notes_editor.setStyleSheet(
-            "background: rgba(10, 10, 25, 150); color: white; border-radius: 20px; "
+            "background: rgba(10, 10, 25, 150); color: white; border-radius: 20px;font-family: 'Inter'; font-size: 16.5px;"
             "padding: 20px; border: 1px solid rgba(255,255,255,10);"
         )
 
@@ -776,7 +788,7 @@ class MainWindow(QMainWindow):
         t_lay.setContentsMargins(15, 25, 15, 25)
         t_lay.setSpacing(14)
 
-        t_lay.addWidget(QLabel("AI TOOLBOX", styleSheet=f"color: {self.color_10_accent}; font-weight: bold;"))
+        t_lay.addWidget(QLabel("AI TOOLBOX", styleSheet=f"color: {self.color_10_accent}; font-weight: bold; font-size: 15px; letter-spacing: 1px;"))
 
         self.tone = QComboBox()
         self.tone.addItems(["Technical", "ELI5", "Bullet Points", "Narrative"])
@@ -785,7 +797,7 @@ class MainWindow(QMainWindow):
             "border: 1px solid rgba(255,255,255,10); } "
             "QComboBox QAbstractItemView { background: #1A1D2E; color: white; selection-background-color: #8B5CF6; }"
         )
-        t_lay.addWidget(QLabel("SUMMARY TONE", styleSheet="color: white; font-size: 10px;"))
+        t_lay.addWidget(QLabel("SUMMARY TONE", styleSheet="color: white; font-size: 12px;"))
         t_lay.addWidget(self.tone)
 
         t_lay.addSpacing(6)
@@ -794,6 +806,7 @@ class MainWindow(QMainWindow):
         self.gen_btn.setMinimumHeight(55)
         self.gen_btn.clicked.connect(self.save_note_to_history)
         t_lay.addWidget(self.gen_btn)
+
 
         # ✅ Import exported JSON (Notes + QnA display)
         import_json_btn = QPushButton("Import Exported JSON")
@@ -844,9 +857,7 @@ class MainWindow(QMainWindow):
 
     def save_note_to_history(self):
         content = self.notes_editor.toPlainText()
-        if not content.strip():
-            QMessageBox.information(self, "Empty", "Write something in the editor first 🙂")
-            return
+        
 
         title = self._make_note_title(content)
         item = QListWidgetItem(title)
@@ -922,46 +933,109 @@ class MainWindow(QMainWindow):
         )
 
     # -------- Quiz Page --------
+    # -------- Quiz Page (Modified) --------
     def setup_quiz(self):
         page = QWidget()
         lay = QHBoxLayout(page)
         lay.setContentsMargins(30, 30, 30, 30)
         lay.setSpacing(25)
 
+        # 1. Main Display Area
         display = GlassCard()
         d_lay = QVBoxLayout(display)
 
         self.quiz_area = QTextEdit()
-        self.quiz_area.setPlaceholderText("Quiz / QnA content...")
-        self.quiz_area.setStyleSheet("background: transparent; color: white; border: none;")
+        self.quiz_area.setPlaceholderText("Quiz / QnA content will appear here...")
+        self.quiz_area.setStyleSheet("background: transparent; color: white; border: none; font-size: 16.5px;")
         d_lay.addWidget(self.quiz_area)
 
+        # 2. Control Sidebar
         ctrls = GlassCard()
         ctrls.setFixedWidth(310)
         c_lay = QVBoxLayout(ctrls)
-        c_lay.setContentsMargins(15, 25, 15, 25)
+        c_lay.setContentsMargins(18, 25, 18, 25)
+        c_lay.setSpacing(15)
 
         c_lay.addWidget(QLabel(
-            "QUIZ CONFIG",
-            styleSheet=f"color: {self.color_10_accent}; font-weight: bold; font-size: 12px;"
+            "QUIZ CONFIGURATION",
+            styleSheet=f"color: {self.color_10_accent}; font-weight: bold; font-size: 15px; letter-spacing: 1px;"
         ))
 
-        spin = QSpinBox()
-        spin.setRange(5, 50)
-        spin.setValue(10)
-        spin.setStyleSheet(
+        # --- Question Type Selection ---
+        c_lay.addWidget(QLabel(
+            "QUESTION TYPE",
+            styleSheet=f"color: {self.color_text_dim}; font-size: 12px; font-weight: bold;"
+        ))
+        
+        self.quiz_type_combo = QComboBox()
+        self.quiz_type_combo.addItems(["Brief Q/Ans", "True/False", "MCQs"])
+        # Set Default to Brief Q/Ans
+        self.quiz_type_combo.setCurrentText("Brief Q/Ans")
+        self.quiz_type_combo.setStyleSheet(
+            "QComboBox { background-color: #1A1D2E; color: white; border-radius: 8px; padding: 10px; "
+            "border: 1px solid rgba(255,255,255,10); } "
+            "QComboBox QAbstractItemView { background: #1A1D2E; color: white; selection-background-color: #8B5CF6; }"
+        )
+        c_lay.addWidget(self.quiz_type_combo)
+
+        # --- Question Count ---
+        c_lay.addWidget(QLabel(
+            "QUESTIONS COUNT",
+            styleSheet=f"color: {self.color_text_dim}; font-size: 12px; font-weight: bold;"
+        ))
+        self.quiz_count_spin = QSpinBox()
+        self.quiz_count_spin.setRange(5, 50)
+        self.quiz_count_spin.setValue(10)
+        self.quiz_count_spin.setStyleSheet(
             "QSpinBox { background-color: #1A1D2E; color: white; border-radius: 8px; padding: 10px; "
             "border: 1px solid rgba(255,255,255,10); }"
         )
+        c_lay.addWidget(self.quiz_count_spin)
 
-        c_lay.addSpacing(20)
-        c_lay.addWidget(QLabel(
-            "QUESTIONS COUNT",
-            styleSheet=f"color: {self.color_text_dim}; font-size: 10px; font-weight: bold;"
+        # --- Character Length Slider ---
+        len_header = QHBoxLayout()
+        len_header.addWidget(QLabel(
+            "CHARACTER LENGTH",
+            styleSheet=f"color: {self.color_text_dim}; font-size: 12px; font-weight: bold;"
         ))
-        c_lay.addWidget(spin)
+        self.char_len_val_label = QLabel("350") # Default Label
+        self.char_len_val_label.setStyleSheet(f"color: {self.color_10_accent}; font-weight: bold; font-size: 10px;")
+        len_header.addStretch()
+        len_header.addWidget(self.char_len_val_label)
+        c_lay.addLayout(len_header)
+
+        self.char_len_slider = QSlider(Qt.Orientation.Horizontal)
+        self.char_len_slider.setRange(100, 500)
+        self.char_len_slider.setValue(350) # Default Value
+        self.char_len_slider.setStyleSheet(f"""
+            QSlider::groove:horizontal {{
+                border: 1px solid #333;
+                height: 4px;
+                background: #1A1D2E;
+                margin: 2px 0;
+                border-radius: 2px;
+            }}
+            QSlider::handle:horizontal {{
+                background: {self.color_10_accent};
+                border: 1px solid {self.color_10_accent};
+                width: 14px;
+                height: 14px;
+                margin: -6px 0;
+                border-radius: 7px;
+            }}
+        """)
+        self.char_len_slider.valueChanged.connect(
+            lambda v: self.char_len_val_label.setText(str(v))
+        )
+        c_lay.addWidget(self.char_len_slider)
+
+        # --- Summary of Types (Info Text) ---
+        c_lay.addSpacing(10)
+        
 
         c_lay.addStretch()
+        
+        # --- Generate Button ---
         quiz_gen_btn = GlowButton("🚀 GENERATE QUIZ", self.color_10_accent)
         quiz_gen_btn.setMinimumHeight(55)
         c_lay.addWidget(quiz_gen_btn)
