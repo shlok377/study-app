@@ -9,6 +9,28 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 
+# --- Import snippet (paste near the other imports in Vishva/UI/main.py) ---
+import importlib.util
+
+# ensure repo root is on sys.path for package imports (optional but helpful)
+_repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if _repo_root not in sys.path:
+    sys.path.insert(0, _repo_root)
+
+ProductivityTimer = None
+try:
+    # preferred: package import (requires __init__.py in Jashn and Jashn/PomodoroTimer)
+    from Jashn.PomodoroTimer.timer import ProductivityTimer
+except Exception:
+    try:
+        # fallback: load file by path
+        timer_path = os.path.join(_repo_root, "Jashn", "PomodoroTimer", "timer.py")
+        spec = importlib.util.spec_from_file_location("pomodoro_module", timer_path)
+        pom_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(pom_mod)
+        ProductivityTimer = getattr(pom_mod, "ProductivityTimer", None)
+    except Exception:
+        ProductivityTimer = None
 
 # ---------- Helpers ----------
 def base_dir() -> str:
@@ -1045,30 +1067,63 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(page)
 
     # -------- Pomodoro Page --------
+    # --- Embed code (replace setup_pomodoro body with this) ---
     def setup_pomodoro(self):
         page = QWidget()
         lay = QVBoxLayout(page)
         lay.setContentsMargins(50, 50, 50, 50)
-
+    
+        if ProductivityTimer is not None:
+            try:
+                prod_widget = ProductivityTimer(parent=self)
+                # adapt appearance to blend with main window if you want:
+                prod_widget.setStyleSheet("background: transparent;")
+                lay.addWidget(prod_widget)
+    
+                # optional: keep mini_timer in sync by polling the embedded timer display
+                def _update_mini():
+                    try:
+                        if hasattr(self, "mini_timer") and hasattr(prod_widget, "timer_tab"):
+                            tmode = getattr(prod_widget, "timer_tab")
+                            val = getattr(tmode, "timer_display").time_str
+                            self.mini_timer.setText(val)
+                    except Exception:
+                        pass
+                    
+                self._mini_sync_timer = QTimer(self)
+                self._mini_sync_timer.setInterval(500)
+                self._mini_sync_timer.timeout.connect(_update_mini)
+                self._mini_sync_timer.start()
+            except Exception as e:
+                print("Failed to embed ProductivityTimer:", e)
+                self._build_builtin_pomodoro_ui(lay)
+        else:
+            # ProductivityTimer not available — use built-in UI
+            self._build_builtin_pomodoro_ui(lay)
+    
+        self.stack.addWidget(page)
+    
+    # --- Helper fallback method to keep the original behavior (add inside MainWindow) ---
+    def _build_builtin_pomodoro_ui(self, parent_layout):
         timer_card = GlassCard()
         cl = QVBoxLayout(timer_card)
-
+    
         self.timer_label = QLabel("25:00")
         self.timer_label.setFont(QFont("Inter", 120, QFont.Weight.Bold))
         self.timer_label.setStyleSheet("color: white;")
         cl.addWidget(self.timer_label, alignment=Qt.AlignmentFlag.AlignCenter)
-
+    
         btn_lay = QHBoxLayout()
         btn_lay.setSpacing(20)
-
+    
         self.start_btn = GlowButton("START", self.color_10_accent)
         self.start_btn.setFixedSize(140, 55)
         self.start_btn.clicked.connect(self.toggle_timer)
-
+    
         self.stop_btn = GlowButton("STOP", self.color_10_accent)
         self.stop_btn.setFixedSize(140, 55)
         self.stop_btn.clicked.connect(self.reset_timer)
-
+    
         self.lap_btn = QPushButton("LAP")
         self.lap_btn.setFixedSize(140, 55)
         self.lap_btn.clicked.connect(self.capture_lap)
@@ -1076,16 +1131,15 @@ class MainWindow(QMainWindow):
             "background: transparent; border: 2px solid white; color: white; "
             "border-radius: 15px; font-weight: bold;"
         )
-
+    
         btn_lay.addStretch()
         btn_lay.addWidget(self.start_btn)
         btn_lay.addWidget(self.stop_btn)
         btn_lay.addWidget(self.lap_btn)
         btn_lay.addStretch()
-
+    
         cl.addLayout(btn_lay)
-        lay.addWidget(timer_card)
-        self.stack.addWidget(page)
+        parent_layout.addWidget(timer_card)
 
     def toggle_timer(self):
         if not self.timer_running:
