@@ -365,17 +365,7 @@ def parse_export_json(data) -> tuple[list[dict], list[dict]]:
 
 # ---------- Main Window ----------
 class MainWindow(QMainWindow):
-    def select_pdf_by_name(self, filename: str) -> bool:
-        """Select a PDF in the list by exact filename (case-insensitive)."""
-        target = (filename or "").strip().lower()
-        for i in range(self.pdf_list.count()):
-            item = self.pdf_list.item(i)
-            if item and item.text().strip().lower() == target:
-                self.pdf_list.setCurrentRow(i)
-                self.pdf_list.scrollToItem(item)
-                return True
-        return False
-
+    
     def __init__(self):
         super().__init__()
 
@@ -579,7 +569,6 @@ class MainWindow(QMainWindow):
             }
         """)
         p_lay.addWidget(self.pdf_list, 1)
-        self.pdf_list.itemDoubleClicked.connect(lambda _: self.open_selected_pdf())
 
         open_btn = QPushButton("Open selected PDF")
         open_btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -623,9 +612,12 @@ class MainWindow(QMainWindow):
         self.quote_label.setText(f"“ {random.choice(self.quotes)} ”")
 
     def refresh_pdf_list(self):
+        # ensure watcher tracks new files too (optional)
         folder = base_dir()
         pdfs = list_pdfs_in_dir(folder)
+        current = {self.pdf_list.item(i).text() for i in range(self.pdf_list.count())}
 
+        # rebuild clean (simpler, consistent with filtering)
         self.pdf_list.clear()
         for f in pdfs:
             self.pdf_list.addItem(f)
@@ -633,9 +625,6 @@ class MainWindow(QMainWindow):
         # apply filter
         if hasattr(self, "pdf_search"):
             self.filter_pdf_list(self.pdf_search.text())
-
-        # ✅ Auto-select Pandas and Numpy.pdf
-        self.select_pdf_by_name("Pandas and Numpy.pdf")
 
     def filter_pdf_list(self, text: str):
         q = (text or "").strip().lower()
