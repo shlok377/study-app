@@ -28,6 +28,12 @@ An AI-powered study companion application that plans your syllabus, summarizes y
 5. Timers monitor the study sessions
 
 
+## > *Demo Video:*
+
+https://www.youtube.com/watch?v=ZYNFM1JGaqw
+
+
+
 ## > *Screenshots:*
 
 ![App Screenshot](https://github.com/shlok377/luminara/blob/main/Mockups/home.png?raw=true)
