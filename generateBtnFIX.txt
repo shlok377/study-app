@@ -1,0 +1,22 @@
+Commands if the Generate button doesnt respond
+
+
+Open the terminal in the main directory of the repository i.e. luminara -> run these commands
+RESULTS WILL BE STORED IN THE MASTER DIRECTORY ITSELF IN .json FORMAT
+
+
+FOR QNA GENERATOR:
+> python ./Shlok/QuizGenerator/main.py --pdf "./your_file.pdf" --type "[type]" --limit [characters]
+
+Options available to replace [type] with:
+1. Long Answer
+2. True/False
+3. MCQ
+
+[characters] can be replaced with any integer between 150 to 450 depending on your requirement,
+You can skip --limit [characters] entirely too
+
+
+
+FOR NOTES GENERATOR:
+> python ./Shlok/CheatSheet/app.py ./your_file.pdf
