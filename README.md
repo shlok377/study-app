@@ -61,7 +61,7 @@ https://www.youtube.com/watch?v=ZYNFM1JGaqw
 ![TeamLogo](https://github.com/shlok377/luminara/blob/main/Logos/TeamTransparentRect.png?raw=true)
 
 - [@shlok.dalsania](https://www.github.com/shlok377) ***Lead Developer**, AI logic, CheatSheet Generator and Quiz Generator*
-- [@vishva.pambhar](https://github.com/vishvapambhar19-commits) - *Frontend UI/UX, Basic Mechanics and Presentation PPT*
+- [@vishva.pambhar](https://github.com/vishva-19) - *Frontend UI/UX, Basic Mechanics and Presentation PPT*
 - [@jashn.joshi](https://github.com/JJstartscoding) - *Focus ZOne Mechanics, Focus Zone UI/UX and Backend Mechanics*
 
 
