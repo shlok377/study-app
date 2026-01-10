@@ -28,6 +28,33 @@ An AI-powered study companion application that plans your syllabus, summarizes y
 5. Timers monitor the study sessions
 
 
+## Run Locally
+
+1. Install and Run the Ollama Application
+
+```bash
+  https://ollama.com/
+```
+
+2. Install Dependencies *(using terminal in the main directory)*
+
+```bash
+  pip install -r requirements.txt
+```
+
+3. Install the Llama3.1 LLM Model
+
+```bash
+  ollama pull llama3.1:8b
+```
+
+4. Get into Flow State 
+
+```bash
+  open mainUI.py file using Python
+```
+
+
 ## > *Demo Video:*
 
 https://www.youtube.com/watch?v=ZYNFM1JGaqw
