@@ -1,3 +1,13 @@
-ollama
 pymupdf
 tqdm
+
+PyQt6
+pyqtdarktheme
+
+PyMuPDF
+
+ollama
+
+dateparser
+
+psutil
